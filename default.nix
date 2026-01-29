@@ -15,5 +15,5 @@
   overlays = import ./overlays; # nixpkgs overlays
 
   zellij-autolock = pkgs.callPackage ./pkgs/zellij-autolock { };
-  # ...
+  zellij-workspace = pkgs.callPackage ./pkgs/zellij-workspace { };
 }
