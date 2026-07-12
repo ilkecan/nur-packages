@@ -24,6 +24,7 @@ in
   homeModules = modules.homeManager;
   nixosModules = modules.nixos;
 
+  icu56 = pkgs.callPackage ./pkgs/icu56 { }; # https://github.com/NixOS/nixpkgs/pull/491823
   wl-find-cursor = pkgs.callPackage ./pkgs/wl-find-cursor { }; # github.com/NixOS/nixpkgs/pull/504085
   zellij-autolock = pkgs.callPackage ./pkgs/zellij-autolock { };
   zellij-workspace = pkgs.callPackage ./pkgs/zellij-workspace { };
