@@ -11,13 +11,22 @@
 }:
 
 let
+  inherit (pkgs) lib;
+
+  modules = import ./modules;
+
   packages = pkgs.lib.packagesFromDirectoryRecursive {
     callPackage = pkgs.newScope packages;
     directory = ./pkgs;
   };
+  upstreamStatus = lib.importTOML ./upstream-status.toml;
 
-  modules = import ./modules;
+  missingFromToml = lib.subtractLists (lib.attrNames upstreamStatus) (lib.attrNames packages);
 in
+assert lib.assertMsg (missingFromToml == [ ]) ''
+  Missing `upstream-status.toml` entries for: ${lib.concatStringsSep ", " missingFromToml}
+  Add a (possibly empty) `[name]` section for each directory under `./pkgs`.
+'';
 {
   # The `lib`, `modules`, and `overlays` names are special
   lib = import ./lib { inherit pkgs; }; # functions
