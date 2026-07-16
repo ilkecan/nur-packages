@@ -6,6 +6,7 @@ let
   inherit (pkgs.lib)
     importTOML
     mapAttrs
+    optionalString
     substring
     warnOnInstantiate
     ;
@@ -30,14 +31,12 @@ let
     in
     if us.merged or false then
       let
-        msg = "`pkgs.nur.repos.ilkecan.${name}` has been upstreamed to nixpkgs and the NUR package will be removed after NixOS ${formatRelease us.removeAfter} is EOL.";
+        msg = "${
+          optionalString (pkgs ? ${name}) "Please use `pkgs.${name}`. "
+        }`pkgs.nur.repos.ilkecan.${name}` has been upstreamed to nixpkgs and the NUR package will be removed after NixOS ${formatRelease us.removeAfter} is EOL.";
       in
-      if pkgs ? ${name} then
-        warnOnInstantiate "Please use `pkgs.${name}`. ${msg}" pkgs.${name}
-      else
-        warnOnInstantiate msg pkg
+      warnOnInstantiate msg pkg
     else
       pkg;
-
 in
 mapAttrs warnIfUpstreamed packages
