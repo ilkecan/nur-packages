@@ -1,0 +1,18 @@
+[bitburner]
+pull = "https://github.com/NixOS/nixpkgs/pull/542677"
+
+[fmodstudio]
+pull = "https://github.com/NixOS/nixpkgs/pull/491823"
+
+[icu56]
+pull = "https://github.com/NixOS/nixpkgs/pull/491823"
+
+[keyguard]
+pull = "https://github.com/NixOS/nixpkgs/pull/495316"
+
+[wl-find-cursor]
+pull = "https://github.com/NixOS/nixpkgs/pull/504085"
+
+[zellij-autolock]
+
+[zellij-workspace]
