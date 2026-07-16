@@ -11,46 +11,8 @@
 }:
 
 let
-  inherit (pkgs.lib)
-    assertMsg
-    attrNames
-    concatStringsSep
-    importTOML
-    mapAttrs
-    subtractLists
-    warnOnInstantiate
-    ;
-
   modules = import ./modules;
-
-  packages = pkgs.lib.packagesFromDirectoryRecursive {
-    callPackage = pkgs.newScope packages;
-    directory = ./pkgs;
-  };
-  upstreamStatus = importTOML ./upstream-status.toml;
-
-  missingFromToml = subtractLists (attrNames upstreamStatus) (attrNames packages);
-
-  warnIfUpstreamed =
-    name: pkg:
-    let
-      us = upstreamStatus.${name};
-    in
-    if us.merged or false then
-      let
-        msg = "`pkgs.nur.repos.ilkecan.${name}` has been upstreamed to nixpkgs and the NUR package will be removed after NixOS ${us.removal} EOL.";
-      in
-      if pkgs ? ${name} then
-        warnOnInstantiate "Please use `pkgs.${name}`. ${msg}" pkgs.${name}
-      else
-        warnOnInstantiate msg pkg
-    else
-      pkg;
 in
-assert assertMsg (missingFromToml == [ ]) ''
-  Missing `upstream-status.toml` entries for: ${concatStringsSep ", " missingFromToml}
-  Add a (possibly empty) `[name]` section for each directory under `./pkgs`.
-'';
 {
   # The `lib`, `modules`, and `overlays` names are special
   lib = import ./lib { inherit pkgs; }; # functions
@@ -62,4 +24,4 @@ assert assertMsg (missingFromToml == [ ]) ''
   homeModules = modules.homeManager;
   nixosModules = modules.nixos;
 }
-// mapAttrs warnIfUpstreamed packages
+// import ./packages.nix { inherit pkgs; }
