@@ -1,19 +1,19 @@
 [bitburner]
-pull = "https://github.com/NixOS/nixpkgs/pull/542677"
+pr = "https://github.com/NixOS/nixpkgs/pull/542677"
 
 [fmodstudio]
-pull = "https://github.com/NixOS/nixpkgs/pull/491823"
+pr = "https://github.com/NixOS/nixpkgs/pull/491823"
 
 [icu56]
-pull = "https://github.com/NixOS/nixpkgs/pull/491823"
+pr = "https://github.com/NixOS/nixpkgs/pull/491823"
 
 [keyguard]
-pull = "https://github.com/NixOS/nixpkgs/pull/495316"
+pr = "https://github.com/NixOS/nixpkgs/pull/495316"
 
 [wl-find-cursor]
-pull = "https://github.com/NixOS/nixpkgs/pull/504085"
+pr = "https://github.com/NixOS/nixpkgs/pull/504085"
 merged = true
-removal = "26.05"
+removeAfter = 2605
 
 [zellij-autolock]
 
