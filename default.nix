@@ -23,6 +23,7 @@ let
     homeModules = modules.homeManager;
     nixosModules = modules.nixos;
 
+    bitburner = pkgs.callPackage ./pkgs/bitburner { }; # https://github.com/NixOS/nixpkgs/pull/542677
     fmodstudio = pkgs.callPackage ./pkgs/fmodstudio { inherit (repo) icu56; }; # https://github.com/NixOS/nixpkgs/pull/491823
     icu56 = pkgs.callPackage ./pkgs/icu56 { }; # https://github.com/NixOS/nixpkgs/pull/491823
     keyguard = pkgs.callPackage ./pkgs/keyguard { }; # https://github.com/NixOS/nixpkgs/pull/495316
