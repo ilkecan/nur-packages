@@ -11,7 +11,15 @@
 }:
 
 let
-  inherit (pkgs) lib;
+  inherit (pkgs.lib)
+    assertMsg
+    attrNames
+    concatStringsSep
+    importTOML
+    mapAttrs
+    subtractLists
+    warnOnInstantiate
+    ;
 
   modules = import ./modules;
 
@@ -19,12 +27,28 @@ let
     callPackage = pkgs.newScope packages;
     directory = ./pkgs;
   };
-  upstreamStatus = lib.importTOML ./upstream-status.toml;
+  upstreamStatus = importTOML ./upstream-status.toml;
 
-  missingFromToml = lib.subtractLists (lib.attrNames upstreamStatus) (lib.attrNames packages);
+  missingFromToml = subtractLists (attrNames upstreamStatus) (attrNames packages);
+
+  warnIfUpstreamed =
+    name: pkg:
+    let
+      us = upstreamStatus.${name};
+    in
+    if us.merged or false then
+      let
+        msg = "`pkgs.nur.repos.ilkecan.${name}` has been upstreamed to nixpkgs and the NUR package will be removed after NixOS ${us.removal} EOL.";
+      in
+      if pkgs ? ${name} then
+        warnOnInstantiate "Please use `pkgs.${name}`. ${msg}" pkgs.${name}
+      else
+        warnOnInstantiate msg pkg
+    else
+      pkg;
 in
-assert lib.assertMsg (missingFromToml == [ ]) ''
-  Missing `upstream-status.toml` entries for: ${lib.concatStringsSep ", " missingFromToml}
+assert assertMsg (missingFromToml == [ ]) ''
+  Missing `upstream-status.toml` entries for: ${concatStringsSep ", " missingFromToml}
   Add a (possibly empty) `[name]` section for each directory under `./pkgs`.
 '';
 {
@@ -38,4 +62,4 @@ assert lib.assertMsg (missingFromToml == [ ]) ''
   homeModules = modules.homeManager;
   nixosModules = modules.nixos;
 }
-// packages
+// mapAttrs warnIfUpstreamed packages
