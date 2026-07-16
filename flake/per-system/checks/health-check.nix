@@ -40,10 +40,10 @@ in
 pkgs.runCommand "health-check" { } (
   assert assertMsg (missingFromToml == [ ]) ''
     Missing `upstream-status.toml` entries for: ${concatStringsSep ", " missingFromToml}
-    Add a (possibly empty) `[name]` section for each directory under `./pkgs`.
+    Add a (possibly empty) `[name]` section for each directory under `./packages`.
   '';
   assert assertMsg (staleInToml == [ ]) ''
-    `upstream-status.toml` has entries with no corresponding `./pkgs` directory: ${concatStringsSep ", " staleInToml}
+    `upstream-status.toml` has entries with no corresponding `./packages` directory: ${concatStringsSep ", " staleInToml}
     Remove these sections, or restore the package if this was accidental.
   '';
   assert assertMsg (mergedWithoutRemoveAfter == [ ]) ''
@@ -52,7 +52,7 @@ pkgs.runCommand "health-check" { } (
   '';
   assert assertMsg (overdueRemovals == [ ]) ''
     These packages are past their `removeAfter` release EOL: ${concatStringsSep ", " overdueRemovals}
-    Delete the `./pkgs/<name>` directory and its `upstream-status.toml` entry.
+    Delete the `./packages/<name>` directory and its `upstream-status.toml` entry.
   '';
   ''
     touch $out

@@ -14,7 +14,7 @@ let
 
   packages = pkgs.lib.packagesFromDirectoryRecursive {
     callPackage = pkgs.newScope packages;
-    directory = ./pkgs;
+    directory = ./packages;
   };
 
   formatRelease =

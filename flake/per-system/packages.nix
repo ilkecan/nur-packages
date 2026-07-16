@@ -1,12 +1,18 @@
 {
-  self,
+  lib,
   ...
 }:
 
+let
+  inherit (lib)
+    filterAttrs
+    isDerivation
+    ;
+in
 {
   perSystem =
-    { pkgs, ... }:
+    { config, ... }:
     {
-      packages = import "${self}/packages.nix" { inherit pkgs; };
+      packages = filterAttrs (_: isDerivation) config.legacyPackages;
     };
 }
