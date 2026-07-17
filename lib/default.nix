@@ -1,7 +1,7 @@
-{ pkgs }:
+{
+  ...
+}:
 
-with pkgs.lib; {
-  # Add your library functions here
-  #
-  # hexint = x: hexvals.${toLower x};
+{
+  INFINITY = 1.0e308 * 2;
 }
