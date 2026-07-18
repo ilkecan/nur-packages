@@ -13,6 +13,7 @@ let
     fromHexString
     genList
     hashString
+    isType
     listToAttrs
     mapAttrsToListRecursive
     nameValuePair
@@ -78,6 +79,8 @@ in
     listToAttrs (
       mapAttrsToListRecursive (path: value: nameValuePair (concatStringsSep sep path) value) attrs
     );
+
+  isFlake = isType "flake";
 
   writeNushellScript =
     let
