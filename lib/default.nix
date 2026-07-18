@@ -1,10 +1,16 @@
 {
+  lib',
+  lib,
   pkgs,
   ...
 }:
 
 let
-  inherit (pkgs.lib)
+  inherit (lib')
+    storePathName
+    ;
+
+  inherit (lib)
     attrNames
     bitXor
     concatMapStrings
@@ -99,6 +105,8 @@ in
     map (name: dir + "/${name}") (attrNames (filterAttrs isImportable (readDir dir)));
 
   isFlake = isType "flake";
+
+  isPatchedFlakeInput = x: storePathName x.outPath != "source";
 
   mkAbsolutePath =
     root: path:
