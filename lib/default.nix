@@ -14,6 +14,7 @@ let
     ;
 
   inherit (lib)
+    assertMsg
     attrNames
     bitXor
     concatMapStrings
@@ -28,6 +29,7 @@ let
     id
     isPath
     isType
+    length
     listToAttrs
     mapAttrs'
     mapAttrsToListRecursive
@@ -114,22 +116,29 @@ in
       importFile = path: importFn (mkAbsolutePath root path);
       importDir =
         path:
-        mapAttrs' (
-          name: type:
-          let
-            name' = normalizeNameFn name;
-            value =
-              if type == "directory" then
-                importTree {
-                  root = mkAbsolutePath root name;
-                  depth = depth - 1;
-                  inherit normalizeNameFn importFn;
-                }
-              else
-                importFile name;
-          in
-          nameValuePair name' value
-        ) (filterAttrs entryFilter (readDir path));
+        let
+          entries = filterAttrs entryFilter (readDir path);
+          result = mapAttrs' (
+            name: type:
+            let
+              name' = normalizeNameFn name;
+              value =
+                if type == "directory" then
+                  importTree {
+                    root = mkAbsolutePath root name;
+                    depth = depth - 1;
+                    inherit normalizeNameFn importFn;
+                  }
+                else
+                  importFile name;
+            in
+            nameValuePair name' value
+          ) entries;
+        in
+        assert assertMsg (
+          length (attrNames entries) == length (attrNames result)
+        ) "importTree: normalized names collide in ${toString path}";
+        result;
     in
     if depth <= 0 then importFile root else importDir root;
 
