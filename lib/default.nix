@@ -7,6 +7,9 @@
 
 let
   inherit (lib')
+    INFINITY
+    importTree
+    mkAbsolutePath
     storePathName
     ;
 
@@ -22,9 +25,11 @@ let
     genList
     hasSuffix
     hashString
+    id
     isPath
     isType
     listToAttrs
+    mapAttrs'
     mapAttrsToListRecursive
     nameValuePair
     pathExists
@@ -91,6 +96,41 @@ in
     listToAttrs (
       mapAttrsToListRecursive (path: value: nameValuePair (concatStringsSep sep path) value) attrs
     );
+
+  importTree =
+    {
+      root,
+
+      depth ? INFINITY,
+      # NOTE: Prefer `importApply` over bare `import` when a module expression
+      # is required. If there is no extra arguments to be passed, file path
+      # (`importFn = id`) is also preferable to `import`.
+      # https://noogle.dev/f/lib/modules/importApply
+      importFn ? import,
+      normalizeNameFn ? id,
+    }:
+    let
+      importFile = path: importFn (mkAbsolutePath root path);
+      importDir =
+        path:
+        mapAttrs' (
+          name: type:
+          let
+            name' = normalizeNameFn name;
+            value =
+              if type == "directory" then
+                importTree {
+                  root = mkAbsolutePath root name;
+                  depth = depth - 1;
+                  inherit normalizeNameFn importFn;
+                }
+              else
+                importFile name;
+          in
+          nameValuePair name' value
+        ) (readDir path);
+    in
+    if depth <= 0 then importFile root else importDir root;
 
   importsFromDirectory =
     dir:
