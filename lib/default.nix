@@ -5,19 +5,24 @@
 
 let
   inherit (pkgs.lib)
+    attrNames
     bitXor
     concatMapStrings
     concatStringsSep
     convertHash
+    filterAttrs
     fixedWidthString
     fromHexString
     genList
+    hasSuffix
     hashString
     isPath
     isType
     listToAttrs
     mapAttrsToListRecursive
     nameValuePair
+    pathExists
+    readDir
     stringLength
     substring
     toHexString
@@ -80,6 +85,18 @@ in
     listToAttrs (
       mapAttrsToListRecursive (path: value: nameValuePair (concatStringsSep sep path) value) attrs
     );
+
+  importsFromDirectory =
+    dir:
+    let
+      isImportable =
+        name: type:
+        if type == "directory" then
+          pathExists (dir + "/${name}/default.nix")
+        else
+          hasSuffix ".nix" name && name != "default.nix";
+    in
+    map (name: dir + "/${name}") (attrNames (filterAttrs isImportable (readDir dir)));
 
   isFlake = isType "flake";
 
