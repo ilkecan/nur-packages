@@ -13,6 +13,7 @@ let
     fromHexString
     genList
     hashString
+    isPath
     isType
     listToAttrs
     mapAttrsToListRecursive
@@ -81,6 +82,17 @@ in
     );
 
   isFlake = isType "flake";
+
+  mkAbsolutePath =
+    root: path:
+    if isPath path then
+      path
+    else
+      let
+        path' = toString path;
+        firstChar = substring 0 1 path';
+      in
+      if firstChar == "/" then path' else root + "/${path'}";
 
   writeNushellScript =
     let
