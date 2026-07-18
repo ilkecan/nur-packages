@@ -94,6 +94,8 @@ in
       in
       if firstChar == "/" then path' else root + "/${path'}";
 
+  storePathName = path: substring 33 (-1) (baseNameOf path);
+
   writeNushellScript =
     let
       shell = "${nushell}/${nushell.shellPath}";
