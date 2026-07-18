@@ -102,6 +102,7 @@ in
       root,
 
       depth ? INFINITY,
+      entryFilter ? (_: _: true),
       # NOTE: Prefer `importApply` over bare `import` when a module expression
       # is required. If there is no extra arguments to be passed, file path
       # (`importFn = id`) is also preferable to `import`.
@@ -128,7 +129,7 @@ in
                 importFile name;
           in
           nameValuePair name' value
-        ) (readDir path);
+        ) (filterAttrs entryFilter (readDir path));
     in
     if depth <= 0 then importFile root else importDir root;
 
