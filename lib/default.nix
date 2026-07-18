@@ -5,6 +5,7 @@
 
 let
   inherit (pkgs)
+    callPackage
     nushell
     writeTextFile
     ;
@@ -12,6 +13,8 @@ in
 {
 
   INFINITY = 1.0e308 * 2;
+
+  callPackage' = fn: callPackage fn { };
 
   writeNushellScript =
     let
