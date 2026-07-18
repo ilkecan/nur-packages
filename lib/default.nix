@@ -7,11 +7,15 @@ let
   inherit (pkgs.lib)
     bitXor
     concatMapStrings
+    concatStringsSep
     convertHash
     fixedWidthString
     fromHexString
     genList
     hashString
+    listToAttrs
+    mapAttrsToListRecursive
+    nameValuePair
     stringLength
     substring
     toHexString
@@ -68,6 +72,12 @@ in
       };
     in
     "${storeDir}/${storeHash}-source";
+
+  flattenAttrs =
+    sep: attrs:
+    listToAttrs (
+      mapAttrsToListRecursive (path: value: nameValuePair (concatStringsSep sep path) value) attrs
+    );
 
   writeNushellScript =
     let
