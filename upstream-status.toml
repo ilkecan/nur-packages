@@ -1,6 +1,9 @@
 [bitburner]
 pr = "https://github.com/NixOS/nixpkgs/pull/542677"
 
+[eez-studio]
+pr = "https://github.com/NixOS/nixpkgs/pull/493671"
+
 [fmodstudio]
 pr = "https://github.com/NixOS/nixpkgs/pull/491823"
 
