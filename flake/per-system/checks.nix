@@ -23,6 +23,7 @@
             self
             ;
         };
-      };
+      }
+      // lib.mapAttrs' (name: lib.nameValuePair "${name}-package") config.packages;
     };
 }
