@@ -7,28 +7,37 @@
   fetchFromGitHub,
   glib,
   gtk3,
+  gtk4,
   jdk21,
   libsecret,
   makeDesktopItem,
   makeWrapper,
   maven,
   nix-update-script,
+  stdenv,
   stripJavaArchivesHook,
   testers,
   unzip,
   webkitgtk_4_1,
   wrapGAppsHook3,
 }:
+let
+  jnaPlatform =
+    {
+      "x86_64-linux" = "linux-x86-64";
+    }
+    .${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+in
 
 maven.buildMavenPackage (finalAttrs: {
   pname = "archi";
-  version = "5.9.0";
+  version = "5.10.0";
 
   src = fetchFromGitHub {
     owner = "archimatetool";
     repo = "archi";
     tag = "release_${finalAttrs.version}";
-    hash = "sha256-d8fpxZhp1hVbjzVGjitc7WKiD8nijMv+1/ZlUOYzmbE=";
+    hash = "sha256-tm41GKf7QFLTyZQkLhSuSs0XELcrlEUYfcya2nNHv5g=";
   };
 
   strictDeps = true;
@@ -37,11 +46,11 @@ maven.buildMavenPackage (finalAttrs: {
   mvnJdk = jdk21;
 
   mvnParameters = lib.escapeShellArgs [
-    "-Pproduct"
     "-Dproject.build.outputTimestamp=1980-01-01T00:00:02Z"
+    "-Pproduct"
   ];
 
-  mvnHash = "sha256-BwEK6ux8BPdpwy+d95HDT4MpV6ksvgdqqXS81yGayAE=";
+  mvnHash = "sha256-f/qnIpkHDdnVYraTlOucgb1tehUBlTUSfN/Yck0jxeo=";
 
   mvnFetchExtraArgs = {
     postInstall = ''
@@ -70,6 +79,7 @@ maven.buildMavenPackage (finalAttrs: {
     cairo
     glib
     gtk3
+    gtk4
   ];
 
   # These are dlopen'd rather than being DT_NEEDED entries, so autoPatchelfHook
@@ -78,6 +88,12 @@ maven.buildMavenPackage (finalAttrs: {
     "${lib.getLib libsecret}/lib" # reached through JNA by Equinox's keyring provider
     "${lib.getLib webkitgtk_4_1}/lib" # dlopen'd by libswt-webkit-gtk for the browser widget
   ];
+
+  postPatch = ''
+    # Source tarballs lack the Git history required by the jgit timestamp provider.
+    substituteInPlace pom.xml \
+      --replace-fail '<timestampProvider>jgit</timestampProvider>' '<timestampProvider>default</timestampProvider>'
+  '';
 
   # Upstream's tests would need extra work to run at all and still fail in the
   # build environment.
@@ -108,6 +124,10 @@ maven.buildMavenPackage (finalAttrs: {
     # - artifacts.xml, p2's index for provisioning and self-update
     cp -r . $out/libexec
     rm $out/libexec/{artifacts.xml,icon.xpm}
+
+    # Keep only the JNA native for the target platform.
+    find $out/libexec/plugins/com.sun.jna_* -type f -name libjnidispatch.so \
+      ! -path '*/com/sun/jna/${jnaPlatform}/*' -delete
     chmod 755 $out/libexec/Archi
 
     # SWT would otherwise unpack its JNI natives at runtime, bypassing
