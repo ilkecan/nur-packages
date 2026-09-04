@@ -50,7 +50,8 @@ maven.buildMavenPackage (finalAttrs: {
   mvnJdk = jdk21;
 
   mvnParameters = lib.escapeShellArgs [
-    "-Dproject.build.outputTimestamp=1980-01-01T00:00:02Z"
+    "-Dbuild.timestamp=198001010000" # application build timestamp
+    "-Dproject.build.outputTimestamp=1980-01-01T00:00:02Z" # JAR/ZIP archive timestamps
     "-Pproduct"
   ];
 
@@ -126,8 +127,15 @@ maven.buildMavenPackage (finalAttrs: {
     # Copy everything except what is not needed:
     # - icon.xpm, superseded by the PNGs installed above
     # - artifacts.xml, p2's index for provisioning and self-update
+    # - p2/, provisioning metadata for unsupported self-update; the profile
+    # snapshots also contain wall-clock times and unordered entries
     cp -r . $out/libexec
     rm $out/libexec/{artifacts.xml,icon.xpm}
+    rm -r $out/libexec/p2/
+
+    # Tycho writes the wall clock into otherwise stable generated metadata.
+    sed -i '/^#.* UTC [0-9]\{4\}$/d' $out/libexec/configuration/config.ini
+    sed -i 's/<config date="[0-9]\+"/<config date="0"/' $out/libexec/configuration/org.eclipse.update/platform.xml
 
     # Keep only the JNA native for the target platform.
     find $out/libexec/plugins/com.sun.jna_* -type f -name libjnidispatch.so \
