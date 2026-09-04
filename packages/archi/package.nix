@@ -22,9 +22,13 @@
   wrapGAppsHook3,
 }:
 let
-  jnaPlatform =
+  platform =
     {
-      "x86_64-linux" = "linux-x86-64";
+      "x86_64-linux" = {
+        jna = "linux-x86-64";
+        product = "linux/gtk/x86_64";
+        swt = "linux.x86_64";
+      };
     }
     .${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 in
@@ -117,7 +121,7 @@ maven.buildMavenPackage (finalAttrs: {
 
     install -Dm444 ${./mime-info.xml} $out/share/mime/packages/archi.xml
 
-    pushd com.archimatetool.editor.product/target/products/com.archimatetool.editor.product/linux/gtk/x86_64/Archi
+    pushd com.archimatetool.editor.product/target/products/com.archimatetool.editor.product/${platform.product}/Archi
 
     # Copy everything except what is not needed:
     # - icon.xpm, superseded by the PNGs installed above
@@ -127,14 +131,14 @@ maven.buildMavenPackage (finalAttrs: {
 
     # Keep only the JNA native for the target platform.
     find $out/libexec/plugins/com.sun.jna_* -type f -name libjnidispatch.so \
-      ! -path '*/com/sun/jna/${jnaPlatform}/*' -delete
+      ! -path "*/com/sun/jna/${platform.jna}/*" -delete
     chmod 755 $out/libexec/Archi
 
     # SWT would otherwise unpack its JNI natives at runtime, bypassing
     # autoPatchelfHook. Unpack them here and point swt.library.path at them
     # instead. The glx and awt natives are excluded because Archi uses neither.
     mkdir -p $out/lib/swt
-    unzip -q -o -d $out/lib/swt plugins/org.eclipse.swt.gtk.linux.x86_64_*.jar '*.so' \
+    unzip -q -o -d $out/lib/swt plugins/org.eclipse.swt.gtk.${platform.swt}_*.jar '*.so' \
       -x '*-glx-*' '*-awt-*'
     substituteInPlace $out/libexec/Archi.ini \
       --replace-fail '-vmargs' "-vmargs
