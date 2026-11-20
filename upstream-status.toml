@@ -27,6 +27,8 @@ pr = "https://github.com/NixOS/nixpkgs/pull/549654"
 [pokeclicker-desktop]
 pr = "https://github.com/NixOS/nixpkgs/pull/545651"
 
+[scopebuddy]
+
 [wl-find-cursor]
 pr = "https://github.com/NixOS/nixpkgs/pull/504085"
 merged = true
