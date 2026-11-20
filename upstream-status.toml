@@ -16,9 +16,6 @@ pr = "https://github.com/NixOS/nixpkgs/pull/550188"
 [icu56]
 pr = "https://github.com/NixOS/nixpkgs/pull/491823"
 
-[keyguard]
-pr = "https://github.com/NixOS/nixpkgs/pull/495316"
-
 [kunkun]
 pr = "https://github.com/NixOS/nixpkgs/pull/549654"
 
