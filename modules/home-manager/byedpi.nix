@@ -1,8 +1,4 @@
 {
-  nixosUtils,
-}:
-
-{
   lib,
   config,
   pkgs,
@@ -11,6 +7,10 @@
 
 let
   cfg = config.services.byedpi;
+  nixosUtils = import ../../lib/nixos-utils.nix {
+    inherit lib;
+    nixpkgs = pkgs.path;
+  };
 in
 {
   meta.maintainers = with lib.maintainers; [ ilkecan ];

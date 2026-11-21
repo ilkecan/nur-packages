@@ -11,17 +11,14 @@
 }:
 
 let
-  inherit (pkgs) lib;
-
-  lib' = import ./lib.nix {
-    inherit lib;
-    nixpkgs = pkgs.path;
-  };
-  modules = import ./modules { inherit lib lib'; };
+  modules = import ./modules;
 in
 {
   # The `lib`, `modules`, and `overlays` names are special
-  lib = lib';
+  lib = import ./lib.nix {
+    inherit (pkgs) lib;
+    nixpkgs = pkgs.path;
+  };
   inherit modules; # modules
   overlays = import ./overlays; # nixpkgs overlays
 

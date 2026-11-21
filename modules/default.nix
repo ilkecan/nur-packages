@@ -1,10 +1,5 @@
 {
-  lib,
-  lib',
-}:
-
-{
   flake = import ./flake;
-  homeManager = import ./home-manager { inherit lib lib'; };
+  homeManager = import ./home-manager;
   nixos = import ./nixos;
 }
