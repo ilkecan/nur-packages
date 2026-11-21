@@ -1,7 +1,6 @@
 {
   lib',
   lib,
-  pkgs,
   ...
 }:
 
@@ -45,31 +44,21 @@ let
     substring
     toHexString
     ;
-
-  inherit (pkgs)
-    callPackage
-    nushell
-    writeTextFile
-    ;
 in
 {
 
   INFINITY = 1.0e308 * 2;
 
   callExpression =
+    pkgs: fn:
     let
-      callExpressionWith =
-        autoArgs: fn:
-        let
-          f = if isFunction fn then fn else import fn;
-          fargs = functionArgs f;
-          args = intersectAttrs fargs autoArgs;
-        in
-        f args;
+      f = if isFunction fn then fn else import fn;
+      fargs = functionArgs f;
+      args = intersectAttrs fargs pkgs;
     in
-    callExpressionWith pkgs;
+    f args;
 
-  callPackage' = fn: callPackage fn { };
+  callPackage' = pkgs: fn: pkgs.callPackage fn { };
 
   flakeInputStorePath =
     let
@@ -204,11 +193,12 @@ in
   storePathName = path: substring 33 (-1) (baseNameOf path);
 
   writeNushellScript =
+    pkgs:
     let
-      shell = "${nushell}/${nushell.shellPath}";
+      shell = "${pkgs.nushell}/${pkgs.nushell.shellPath}";
     in
     name: text:
-    writeTextFile {
+    pkgs.writeTextFile {
       inherit name;
       executable = true;
 
