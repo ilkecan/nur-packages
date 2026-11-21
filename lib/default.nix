@@ -1,6 +1,7 @@
 {
   lib',
   lib,
+  nixpkgs,
   ...
 }:
 
@@ -189,6 +190,8 @@ in
           ) lock.root inputSpec;
     in
     resolveNodeName;
+
+  nixosUtils = import ./nixos-utils.nix { inherit lib nixpkgs; };
 
   storePathName = path: substring 33 (-1) (baseNameOf path);
 
