@@ -1,11 +1,8 @@
 {
-  pkgs,
+  lib,
 }:
 
 let
-  lib' = import ./lib {
-    inherit lib' pkgs;
-    inherit (pkgs) lib;
-  };
+  lib' = import ./lib { inherit lib lib'; };
 in
 lib'
